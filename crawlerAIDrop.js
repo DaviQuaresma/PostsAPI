@@ -3,7 +3,7 @@
 const puppeteer = require("puppeteer");
 const resumirComIA = require("./API/resumeIA");
 
-async function scrapingPages() {
+async function scrapingPages(maxPosts = 5) {
 	const browser = await puppeteer.launch({ headless: false });
 	const page = await browser.newPage();
 
@@ -13,43 +13,46 @@ async function scrapingPages() {
 		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3"
 	);
 
-	const cards = await page.$$(
-		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3 > div"
+	// Extrai todos os hrefs logo após carregar a página principal
+	const hrefs = await page.$$eval(
+		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3 > div a",
+		(anchors) => {
+			const hrefSet = new Set();
+			return anchors
+				.map((a) => a.href)
+				.filter((href) => href.includes("/p/")) // só posts
+				.filter((href) => {
+					if (hrefSet.has(href)) return false; // remove repetidos
+					hrefSet.add(href);
+					return true;
+				});
+		}
 	);
 
-	console.log(`🔎 Número de cards encontrados: ${cards.length}`);
+	console.log(`🔎 Total de links capturados: ${hrefs.length}`);
+	const total = Math.min(maxPosts, hrefs.length);
 
-	// Clica no primeiro card
-	if (cards.length > 0) {
-		const firstCard = cards[0];
-		const link = await firstCard.$("a");
+	for (let i = 0; i < total; i++) {
+		const href = hrefs[i];
+		console.log(`🔗 [${i + 1}] Navegando para: ${href}`);
 
-		if (link) {
-			const href = await link.evaluate((el) => el.href);
-			console.log("🔗 Navegando para:", href);
+		await page.goto(href, { waitUntil: "networkidle2" });
 
-			await page.goto(href, { waitUntil: "networkidle2" });
-			console.log("📄 Página nova:", page.url());
+		await page.waitForSelector("#content-blocks");
+		const texto = await page.$eval("#content-blocks", (el) => el.innerText);
 
-			// Aguarda o conteúdo da notícia aparecer
-			await page.waitForSelector("#content-blocks");
+		console.log(`🧾 Capturado conteúdo do post ${i + 1}, resumindo com IA...`);
 
-			// Extrai o conteúdo do post
-			const texto = await page.$eval("#content-blocks", (el) => el.innerText);
+		const textoLimpo = texto.slice(0, 3000);
+		const resumo = await resumirComIA(textoLimpo);
 
-			console.log("🧾 Texto capturado, resumindo com IA...");
-
-			// Chamada para função de resumo com IA
-			const textoLimpo = texto.slice(0, 3000);
-            const resumo = await resumirComIA(textoLimpo);
-
-			console.log(resumo);
-		}
+		console.log(`📢 RESUMO ${i + 1}:\n${resumo}`);
 	}
-	// await browser.close();
+
+	await browser.close();
 }
 
-scrapingPages();
+scrapingPages(5); // ou scrapingPages(5), etc
 
 // const title = await page.title();
 // const url = page.url();
