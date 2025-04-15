@@ -40,7 +40,8 @@ async function scrapingPages() {
 			console.log("🧾 Texto capturado, resumindo com IA...");
 
 			// Chamada para função de resumo com IA
-			const resumo = await resumirComIA(texto);
+			const textoLimpo = texto.slice(0, 3000);
+            const resumo = await resumirComIA(textoLimpo);
 
 			console.log(resumo);
 		}

@@ -1,30 +1,31 @@
 /** @format */
-require("dotenv").config();
+
 const OpenAI = require("openai");
+require("dotenv").config();
 
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY, // ou coloque direto a chave
+	apiKey: process.env.OPENAI_API_KEY2,
 });
 
 async function resumirComIA(texto) {
+	const prompt = `
+	Você é um redator profissional de redes sociais. Sua tarefa é criar conteúdo no estilo carrossel para Instagram ou LinkedIn, baseado no texto abaixo.
+	
+	Crie um post com as seguintes características:
+	- Um título em MAIÚSCULAS com até 10 palavras, direto e chamativo.
+	- Um único parágrafo de 4 a 5 linhas com linguagem objetiva, informativa e clara.
+	- Tente alcançar até 500 caracteres
+	- Não utilize listas, tópicos ou hashtags.
+	- Não inclua frases promocionais, datas de envio, chamadas de email ou expressões como "toda segunda no seu inbox".
+	- Escreva como se o conteúdo fosse original do próprio autor do post (não cite fontes externas).
+	
+	Texto base:
+	"""${texto}"""
+	`;
+
 	const chatCompletion = await openai.chat.completions.create({
 		model: "gpt-3.5-turbo",
-		messages: [
-			{
-				role: "user",
-				content: `
-Resuma o conteúdo abaixo em formato de post informativo para redes sociais, estilo carrossel (como no Instagram ou LinkedIn). O resumo deve conter:
-
-1. Um título direto e chamativo (máx. 10 palavras), tudo em maiúsculas.
-2. Um parágrafo curto (2 a 3 linhas) explicando de forma objetiva e impactante o conteúdo.
-
-Evite enrolação. Fale como um redator de notícias de tecnologia para jovens profissionais.
-
-Texto:
-"""${texto}"""
-`,
-			},
-		],
+		messages: [{ role: "user", content: prompt }],
 		temperature: 0.7,
 	});
 
