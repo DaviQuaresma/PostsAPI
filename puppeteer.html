@@ -1,0 +1,143 @@
+🧠 Classe: puppeteer
+launch(options): Inicia uma nova instância do navegador com as opções especificadas.
+
+connect(options): Conecta-se a uma instância existente do navegador via WebSocket.
+
+createBrowserFetcher(options): Cria um objeto para gerenciar downloads de diferentes versões do Chromium.​
+Pptr
+
+🌐 Classe: Browser
+newPage(): Abre uma nova aba no navegador.
+
+pages(): Retorna todas as abas abertas.
+
+close(): Fecha o navegador.
+
+version(): Retorna a versão do navegador.
+
+userAgent(): Retorna o user agent do navegador.
+
+wsEndpoint(): Retorna o endpoint WebSocket para conexão remota.​
+getpuppeteer.ai
++10
+Chrome for Developers
++10
+DevDocs
++10
+Pptr
+
+📄 Classe: Page
+goto(url, options): Navega para a URL especificada.
+
+reload(options): Recarrega a página atual.
+
+setContent(html): Define o conteúdo HTML da página.
+
+content(): Retorna o conteúdo HTML da página.
+
+pdf(options): Gera um PDF da página.
+
+screenshot(options): Tira uma captura de tela da página.
+
+evaluate(pageFunction, args): Executa uma função no contexto da página.
+
+evaluateHandle(pageFunction, args): Semelhante ao evaluate, mas retorna um handle para o resultado.
+
+exposeFunction(name, puppeteerFunction): Expõe uma função Node.js no contexto da página.
+
+addScriptTag(options): Adiciona uma tag <script> à página.
+
+addStyleTag(options): Adiciona uma tag <style> à página.
+
+click(selector, options): Clica no elemento correspondente ao seletor.
+
+type(selector, text, options): Digita o texto no elemento correspondente ao seletor.
+
+hover(selector): Passa o mouse sobre o elemento correspondente ao seletor.
+
+focus(selector): Foca no elemento correspondente ao seletor.
+
+keyboard: Objeto para interações com o teclado.
+
+mouse: Objeto para interações com o mouse.
+
+touchscreen: Objeto para interações com a tela sensível ao toque.
+
+waitForSelector(selector, options): Espera até que o seletor apareça na página.
+
+waitForXPath(xpath, options): Espera até que o XPath apareça na página.
+
+waitForFunction(pageFunction, options, args): Espera até que a função retorne verdadeiro.
+
+waitForTimeout(milliseconds): Espera pelo tempo especificado.
+
+setViewport(viewport): Define o tamanho da janela de visualização.
+
+viewport(): Retorna o tamanho atual da janela de visualização.
+
+screenshot(options): Captura uma imagem da página.
+
+pdf(options): Gera um PDF da página.
+
+title(): Retorna o título da página.
+
+url(): Retorna a URL da página.
+
+setUserAgent(userAgent): Define o user agent da página.
+
+setExtraHTTPHeaders(headers): Define cabeçalhos HTTP adicionais.
+
+cookies(...urls): Retorna os cookies da página.
+
+setCookie(...cookies): Define cookies na página.
+
+deleteCookie(...cookies): Exclui cookies da página.
+
+on(event, handler): Adiciona um manipulador para eventos da página.​
+Pptr
+
+🔍 Classe: ElementHandle
+click(options): Clica no elemento.
+
+hover(): Passa o mouse sobre o elemento.
+
+focus(): Foca no elemento.
+
+type(text, options): Digita o texto no elemento.
+
+press(key, options): Pressiona uma tecla no elemento.
+
+evaluate(pageFunction, args): Executa uma função no contexto do elemento.
+
+boundingBox(): Retorna a caixa delimitadora do elemento.
+
+screenshot(options): Captura uma imagem do elemento.
+
+asElement(): Retorna o próprio ElementHandle.
+
+dispose(): Libera os recursos associados ao handle.​
+GitHub
++5
+Chrome for Developers
++5
+Chrome for Developers
++5
+Chrome for Developers
++19
+Chrome for Developers
++19
+Pptr
++19
+getpuppeteer.ai
++4
+GitHub
++4
+GitHub
++4
+
+🌐 Classe: Frame
+goto(url, options): Navega para a URL especificada no frame.
+
+waitForSelector(selector, options): Espera até que o seletor apareça no frame.
+
+evaluate(pageFunction, args): Executa uma função no contexto do frame.
