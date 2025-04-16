@@ -1,30 +1,24 @@
-/** @format */
+/**
+ * crawlerAIDrop.js - Retorna um array de objetos com dados prontos para gerar imagem de post
+ * @format
+ */
 
 const puppeteer = require("puppeteer");
 const resumirComIA = require("../API/resumeIA");
-const fs = require("fs");
-const fetch = require("node-fetch"); // com letra minúscula
 const path = require("path");
+const fs = require("fs");
+const fetch = require("node-fetch");
 
-async function downloadImage(url, filename) {
-	const dir = path.join(__dirname, "../imgs/airdrop");
-	fs.mkdirSync(dir, { recursive: true });
-
-	const res = await fetch(url);
-	const buffer = await res.buffer();
-	fs.writeFileSync(path.join(dir, filename), buffer);
-}
-module.exports = async function scrapingPages(maxPosts = 5) {
-	const browser = await puppeteer.launch({ headless: false });
+module.exports = async function scrapingAirdrop(maxPosts = 5) {
+	const browser = await puppeteer.launch({ headless: true });
 	const page = await browser.newPage();
+	const posts = [];
 
 	await page.goto("https://www.aidrop.news", { waitUntil: "networkidle2" });
-
 	await page.waitForSelector(
 		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3"
 	);
 
-	// Extrai todos os hrefs logo após carregar a página principal
 	const cardsData = await page.$$eval(
 		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3 > div",
 		(cards) =>
@@ -37,33 +31,49 @@ module.exports = async function scrapingPages(maxPosts = 5) {
 				.filter((c) => c.link?.includes("/p/"))
 	);
 
-	// console.log(`🔎 Total de links capturados: ${hrefs.length}`);
 	const total = Math.min(maxPosts, cardsData.length);
 
 	for (let i = 0; i < total; i++) {
-		const { link: href, img } = cardsData[i];
+		const { link, img } = cardsData[i];
 
-		console.log(`🔗 [${i + 1}] Navegando para: ${href}`);
+		try {
+			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
+			await page.waitForSelector("#content-blocks");
 
-		// Baixa a imagem do card
-		if (img) {
-			const filename = `post-${i + 1}.jpg`;
-			await downloadImage(img, filename);
-			console.log(`🖼️ Imagem salva: ./imgs/${filename}`);
+			const texto = await page.$eval("#content-blocks", (el) =>
+				el.innerText.trim()
+			);
+			const { titulo, resumo } = await resumirComIA(texto.slice(0, 8000));
+
+			const imagePath = path.join(
+				__dirname,
+				`../imgs/airdrop/airdrop-post-${i + 1}.jpg`
+			);
+			if (img) {
+				const res = await fetch(img);
+				if (!res.ok)
+					throw new Error(`Erro ao baixar imagem: ${res.statusText}`);
+				const buffer = await res.buffer();
+				fs.mkdirSync(path.dirname(imagePath), { recursive: true });
+				fs.writeFileSync(imagePath, buffer);
+			}
+
+			posts.push({
+				titulo,
+				resumo,
+				imagem: `data:image/jpeg;base64,${fs.readFileSync(imagePath, {
+					encoding: "base64",
+				})}`,
+				fonte: "AIDrop News",
+				autor: "Felipe Karimata",
+				username: "@eyes.bot",
+				avatar: `file://${path.join(__dirname, "../imgs/autor.jpg")}`,
+			});
+		} catch (err) {
+			console.error(`❌ Erro ao processar post ${i + 1}:`, err.message);
 		}
-
-		await page.goto(href, { waitUntil: "networkidle2" });
-
-		await page.waitForSelector("#content-blocks");
-		const texto = await page.$eval("#content-blocks", (el) => el.innerText);
-
-		console.log(`🧾 Capturado conteúdo do post ${i + 1}, resumindo com IA...`);
-
-		const textoLimpo = texto.slice(0, 3000);
-		const resumo = await resumirComIA(textoLimpo);
-
-		console.log(`📢 RESUMO ${i + 1}:\n${resumo}`);
 	}
 
 	await browser.close();
-}
+	return posts;
+};

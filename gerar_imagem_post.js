@@ -8,11 +8,12 @@ const path = require("path");
 async function gerarImagemPost(dados, index = 1) {
 	const templatePath = path.join(__dirname, "template.html");
 	const outputPath = path.join(__dirname, `output/post-${index}.png`);
-	fs.mkdirSync(path.dirname(outputPath), { recursive: true }); // 👈 garante que a pasta existe
+	fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
 	let html = fs.readFileSync(templatePath, "utf-8");
 
 	html = html
+		.replace(/{{NUMERO}}/g, index)
 		.replace(/{{FONTE}}/g, dados.fonte)
 		.replace(/{{TITULO}}/g, dados.titulo)
 		.replace(/{{RESUMO}}/g, dados.resumo)
@@ -34,19 +35,3 @@ async function gerarImagemPost(dados, index = 1) {
 }
 
 module.exports = gerarImagemPost;
-
-// Exemplo de uso direto
-if (require.main === module) {
-	const dadosExemplo = {
-		fonte: "TechCrunch",
-		titulo: "Meta lança o Llama 4",
-		resumo:
-			"A nova geração do Llama impressiona nos benchmarks, mas decepciona em respostas reais. Será que ele cumpre o que promete?",
-		imagem: "file://" + path.join(__dirname, "imgs/llama4.jpg"),
-		avatar: "file://" + path.join(__dirname, "imgs/autor.jpg"),
-		autor: "Felipe Karimata",
-		username: "@eyes.bot",
-	};
-
-	gerarImagemPost(dadosExemplo, 1);
-}
