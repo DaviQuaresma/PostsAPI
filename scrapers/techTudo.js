@@ -15,7 +15,7 @@ async function downloadImage(url, filename) {
     fs.writeFileSync(path.join(dir, filename), buffer);
 }
 
-async function scrapingTechtudo(maxPosts = 5) {
+module.exports = async function scrapingTechtudo(maxPosts = 5) {
 	const browser = await puppeteer.launch({ headless: false });
 	const page = await browser.newPage();
 
@@ -69,5 +69,3 @@ async function scrapingTechtudo(maxPosts = 5) {
 
 	await browser.close();
 }
-
-scrapingTechtudo(3);

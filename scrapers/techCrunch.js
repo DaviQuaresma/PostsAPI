@@ -15,7 +15,7 @@ async function downloadImage(url, filename) {
     fs.writeFileSync(path.join(dir, filename), buffer);
 }
 
-async function scrapingPages(maxPosts = 5) {
+module.exports = async function scrapingPages(maxPosts = 5) {
 	const browser = await puppeteer.launch({ headless: false });
 	const page = await browser.newPage();
 
@@ -71,5 +71,3 @@ async function scrapingPages(maxPosts = 5) {
 
 	await browser.close();
 }
-
-scrapingPages(5);
