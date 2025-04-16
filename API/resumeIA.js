@@ -1,7 +1,8 @@
 /** @format */
 
 const OpenAI = require("openai");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY2,
@@ -14,7 +15,7 @@ async function resumirComIA(texto) {
 	Crie um post com as seguintes características:
 	- Um título em MAIÚSCULAS com até 10 palavras, direto e chamativo.
 	- Um único parágrafo de 4 a 5 linhas com linguagem objetiva, informativa e clara.
-	- Tente alcançar até 500 caracteres
+	- Tente alcançar até 300 caracteres
 	- Não utilize listas, tópicos ou hashtags.
 	- Não inclua frases promocionais, datas de envio, chamadas de email ou expressões como "toda segunda no seu inbox".
 	- Escreva como se o conteúdo fosse original do próprio autor do post (não cite fontes externas).

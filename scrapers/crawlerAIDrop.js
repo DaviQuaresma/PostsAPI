@@ -1,17 +1,19 @@
 /** @format */
 
 const puppeteer = require("puppeteer");
-const resumirComIA = require("./API/resumeIA");
+const resumirComIA = require("../API/resumeIA");
 const fs = require("fs");
 const fetch = require("node-fetch"); // com letra minúscula
 const path = require("path");
 
 async function downloadImage(url, filename) {
+	const dir = path.join(__dirname, "../imgs/airdrop");
+	fs.mkdirSync(dir, { recursive: true });
+
 	const res = await fetch(url);
 	const buffer = await res.buffer();
-	fs.writeFileSync(path.join(__dirname, "imgs", filename), buffer);
+	fs.writeFileSync(path.join(dir, filename), buffer);
 }
-
 async function scrapingPages(maxPosts = 5) {
 	const browser = await puppeteer.launch({ headless: false });
 	const page = await browser.newPage();
