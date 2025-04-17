@@ -1,15 +1,20 @@
 /** @format */
 
 // gerar_imagem_post.js
+
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
 
 async function gerarImagemPost(dados, index = 1) {
-	const templatePath = path.join(__dirname, "template.html");
-	const outputPath = path.join(__dirname, `output/post-${index}.png`);
+	// Caminho absoluto para o template.html na raiz do projeto
+	const templatePath = path.resolve(__dirname, "../template.html");
+	const outputPath = path.resolve(__dirname, "../output", `post-${index}.png`);
+
+	// Garante que a pasta 'output' existe
 	fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 
+	// Lê o conteúdo do template e insere os dados
 	let html = fs.readFileSync(templatePath, "utf-8");
 
 	html = html
@@ -22,13 +27,14 @@ async function gerarImagemPost(dados, index = 1) {
 		.replace(/{{AUTOR}}/g, dados.autor)
 		.replace(/{{USERNAME}}/g, dados.username);
 
+	// Lança o navegador e gera o print
 	const browser = await puppeteer.launch({ headless: true });
 	const page = await browser.newPage();
 
 	await page.setViewport({ width: 1080, height: 1080 });
 	await page.setContent(html, { waitUntil: "networkidle0" });
-
 	await page.screenshot({ path: outputPath });
+
 	await browser.close();
 
 	console.log(`✅ Imagem gerada: ${outputPath}`);

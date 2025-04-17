@@ -44,11 +44,27 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 
 		try {
 			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
-			await page.waitForSelector(".wp-block-column.is-layout-flow");
+			try {
+				await page.waitForSelector(".wp-block-column.is-layout-flow", {
+					timeout: 8000,
+				});
+			} catch (err) {
+				console.warn(`⚠️ Conteúdo não encontrado no post ${i + 1}, pulando...`);
+				continue;
+			}
 
-			const texto = await page.$eval(".wp-block-column.is-layout-flow", (el) =>
-				el.innerText.trim()
-			);
+			const texto = await page.evaluate(() => {
+				const el =
+					document.querySelector(".wp-block-column.is-layout-flow") ||
+					document.querySelector(".article-content") ||
+					document.querySelector("article");
+				return el ? el.innerText.trim() : "";
+			});
+
+			if (!texto) {
+				console.warn(`⚠️ Texto vazio no post ${i + 1}, pulando...`);
+				continue;
+			}
 
 			const { titulo, resumo } = await resumirComIA(texto.slice(0, 8000));
 

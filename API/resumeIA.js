@@ -16,7 +16,7 @@ async function resumirComIA(texto) {
 	
 	🔹 Instruções:
 	1. Gere um **TÍTULO EM PORTUGUÊS**, com até **10 palavras**, todo em **MAIÚSCULAS**, que capture a essência da notícia. O título deve ser claro, informativo e atrativo.
-	2. Gere um **RESUMO DENSO E ORIGINAL** com exatos **400 caracteres** a **430 caracteres**. Ele deve explicar a notícia de forma aprofundada, com vocabulário técnico e conciso. Reescreva o conteúdo com suas próprias palavras — evite copiar frases do texto original.
+	2. Gere um **RESUMO DENSO E ORIGINAL** com exatos **minimos de 300 caracteres a 350 caracteres no maximo**. Ele deve explicar a notícia de forma aprofundada, com vocabulário técnico e conciso. Reescreva o conteúdo com suas próprias palavras — evite copiar frases do texto original.
 	3. Foque em **dados técnicos**, **impactos reais no setor de tecnologia**, **exemplos práticos** e **benefícios concretos**. Nada de vaguidão.
 	4. Não use listas, emojis, hashtags, tópicos ou chamadas genéricas como "neste carrossel", "como falamos antes", "segunda no seu e-mail" etc.
 	5. **Traduza** todo o conteúdo para o português antes de processar.
