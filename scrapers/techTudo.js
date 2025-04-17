@@ -31,9 +31,12 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 	);
 
 	const total = Math.min(maxPosts, cards.length);
+	const shuffled = cards.sort(() => 0.5 - Math.random());
+	const selecionados = shuffled.slice(0, total);
 
-	for (let i = 0; i < total; i++) {
-		const { link, image } = cards[i];
+	for (let i = 0; i < selecionados.length; i++) {
+		const { link, image } = selecionados[i];
+
 		try {
 			await page.goto(link, { waitUntil: "networkidle2" });
 			await page.waitForSelector(".mrf-article-body");

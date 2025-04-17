@@ -32,9 +32,11 @@ module.exports = async function scrapingAirdrop(maxPosts = 5) {
 	);
 
 	const total = Math.min(maxPosts, cardsData.length);
+	const shuffled = cardsData.sort(() => 0.5 - Math.random());
+	const selecionados = shuffled.slice(0, total);
 
-	for (let i = 0; i < total; i++) {
-		const { link, img } = cardsData[i];
+	for (let i = 0; i < selecionados.length; i++) {
+		const { link, img } = selecionados[i];
 
 		try {
 			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
