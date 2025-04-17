@@ -8,7 +8,7 @@ const path = require("path");
 
 async function gerarImagemPost(dados, index = 1) {
 	// Caminho absoluto para o template.html na raiz do projeto
-	const templatePath = path.resolve(__dirname, "../template.html");
+	const templatePath = path.resolve(__dirname, "../public/template.html");
 	const outputPath = path.resolve(__dirname, "../output", `post-${index}.png`);
 
 	// Garante que a pasta 'output' existe

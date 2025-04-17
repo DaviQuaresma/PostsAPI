@@ -4,11 +4,11 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const dotenv = require("dotenv");
-const gerarImagemPost = require("./others/gerar_imagem_post");
-const runAiDrop = require("./scrapers/crawlerAIDrop");
-const runTechCrunch = require("./scrapers/techCrunch");
-const runTechTudo = require("./scrapers/techTudo");
-const enviarEmailComImagens = require("./others/sendEmail.js"); // <- Novo
+const gerarImagemPost = require("../others/gerar_imagem_post.js");
+const runAiDrop = require("../scrapers/crawlerAIDrop.js");
+const runTechCrunch = require("../scrapers/techCrunch.js");
+const runTechTudo = require("../scrapers/techTudo.js");
+const enviarEmailComImagens = require("../others/sendEmail.js"); // <- Novo
 
 dotenv.config(); // <- Carrega variáveis do .env
 

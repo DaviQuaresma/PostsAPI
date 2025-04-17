@@ -4,7 +4,7 @@
  */
 
 const puppeteer = require("puppeteer");
-const resumirComIA = require("../API/resumeIA");
+const resumirComIA = require("../others/resumeIA");
 const path = require("path");
 const fs = require("fs");
 const fetch = require("node-fetch");
