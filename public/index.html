@@ -1,5 +1,4 @@
 <!-- @format -->
-
 <!DOCTYPE html>
 <html lang="pt-br">
 	<head>
@@ -58,6 +57,16 @@
 						value="2"
 						min="0" />
 				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Senha de acesso</label>
+					<input
+						type="password"
+						id="senha"
+						class="form-control"
+						placeholder="Digite a senha" />
+				</div>
+
 				<div class="col-12">
 					<button
 						type="submit"
@@ -91,8 +100,17 @@
 			const loading = document.getElementById("loading");
 			const statusMsg = document.getElementById("status-msg");
 
+			const senhaFixa = "noticiabot2025"; // ✅ Altere aqui sua senha fixa
+
 			form.addEventListener("submit", async (e) => {
 				e.preventDefault();
+
+				const senhaDigitada = document.getElementById("senha").value;
+				if (senhaDigitada !== senhaFixa) {
+					statusMsg.textContent = "❌ Senha incorreta!";
+					statusMsg.className = "text-danger mt-3";
+					return;
+				}
 
 				const techCrunch = document.getElementById("techCrunch").value;
 				const airdrop = document.getElementById("airdrop").value;
@@ -117,6 +135,7 @@
 					statusMsg.className = "text-danger mt-3";
 				}
 
+				senhaDigitada.text = "";
 				loading.style.display = "none";
 				btn.disabled = false;
 			});
