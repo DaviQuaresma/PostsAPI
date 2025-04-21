@@ -64,6 +64,8 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.static("public"));
 
+// senha = noticiabot2025
+
 app.get("/executar", async (req, res) => {
 	const techCrunch = parseInt(req.query.techCrunch) || 0;
 	const airdrop = parseInt(req.query.airdrop) || 0;
