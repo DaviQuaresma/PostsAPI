@@ -31,7 +31,11 @@ async function gerarImagemPost(dados, index = 1) {
 	const browser = await puppeteer.launch({ headless: true });
 	const page = await browser.newPage();
 
-	await page.setViewport({ width: 1080, height: 1080 });
+	await page.setViewport({
+		width: 1080,
+		height: 1350,
+		deviceScaleFactor: 1, // mantém a escala exata sem zoom
+	});
 	await page.setContent(html, { waitUntil: "networkidle0" });
 	await page.screenshot({ path: outputPath });
 

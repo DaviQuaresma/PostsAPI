@@ -40,6 +40,12 @@ async function enviarEmailComImagens() {
 	try {
 		const info = await transporter.sendMail(mailOptions);
 		console.log("📤 Email enviado com sucesso:", info.response);
+
+		// Apaga arquivos da pasta output após envio
+		for (const file of arquivos) {
+			fs.unlinkSync(path.join(outputDir, file));
+		}
+		console.log("🧹 Pasta 'output' limpa com sucesso.");
 	} catch (err) {
 		console.error("❌ Erro ao enviar email:", err.message);
 	}
