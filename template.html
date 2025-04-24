@@ -10,18 +10,21 @@
 		<link
 			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 			rel="stylesheet" />
+		<link
+			href="https://fonts.cdnfonts.com/css/aloevera-display"
+			rel="stylesheet" />
+
 		<style>
 			body {
 				width: 1080px;
 				height: 1350px;
-				background: #0C334E;
+				background: #0c334e;
 				color: #f1f1f1;
 				padding: 40px;
 				font-family: "Segoe UI", sans-serif;
 				margin: 0;
 				overflow: hidden;
 				box-sizing: border-box;
-				position: relative;
 				display: flex;
 				flex-direction: column;
 				justify-content: flex-start;
@@ -42,18 +45,20 @@
 			}
 
 			h1 {
+				font-family: "Aloevera Display", sans-serif;
+				font-weight: bold;
 				font-size: 52px;
 				line-height: 1.3;
 				margin: 80px 0 16px;
-				color: #ffffff;
 			}
 
 			p {
+				font-family: "Aloevera Display", sans-serif;
+				font-weight: normal;
 				font-size: 30px;
 				line-height: 1.6;
-				color: #d9e6f2;
-				margin-bottom: auto;
 				text-align: justify;
+				margin-bottom: auto;
 				max-height: 440px;
 				overflow: hidden;
 			}
@@ -65,11 +70,12 @@
 			.card-img-top {
 				border-radius: 14px;
 				width: 100%;
-				height: 400px;
+				height: 440px; /* aumentar um pouco pra compensar o cover */
 				object-fit: cover;
 				object-position: center;
 				box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 				margin-bottom: 12px;
+				background: transparent; /* remover fundo branco */
 			}
 
 			.author {
@@ -102,7 +108,6 @@
 				alt="Imagem do post"
 				class="card-img-top" />
 			<div class="author">
-				<!-- <strong>{{AUTOR}}</strong> -->
 				<span>{{USERNAME}}</span>
 			</div>
 		</div>
