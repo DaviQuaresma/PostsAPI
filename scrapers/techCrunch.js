@@ -89,7 +89,7 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 				})}`,
 				fonte: "TechCrunch",
 				autor: "Felipe Karimata",
-				username: "@eyes.bot",
+				username: "@karimata.ia",
 				avatar: `file://${path.join(__dirname, "../imgs/autor.jpg")}`,
 			});
 		} catch (err) {

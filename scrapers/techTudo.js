@@ -68,7 +68,7 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 				})}`,
 				fonte: "TechTudo",
 				autor: "Felipe Karimata",
-				username: "@eyes.bot",
+				username: "@karimata.ia",
 				avatar: `file://${path.join(__dirname, "../imgs/autor.jpg")}`,
 			});
 		} catch (err) {
