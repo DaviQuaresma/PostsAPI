@@ -16,7 +16,7 @@ async function resumirComIA(texto) {
 	
 	🔹 Instruções:
 	1. Gere um **TÍTULO EM PORTUGUÊS**, com até **10 palavras**, todo em **MAIÚSCULAS**, que capture a essência da notícia. O título deve ser claro, informativo e atrativo.
-	2. Gere um **RESUMO DENSO E ORIGINAL** com exatos **minimos de 300 caracteres a 350 caracteres no maximo**. Ele deve explicar a notícia de forma aprofundada, com vocabulário técnico e conciso. Reescreva o conteúdo com suas próprias palavras — evite copiar frases do texto original.
+	2. Gere um **RESUMO DENSO E ORIGINAL** com exatos **minimos de 350 caracteres a 400 caracteres no maximo**. Ele deve explicar a notícia de forma aprofundada, com vocabulário técnico e conciso. Reescreva o conteúdo com suas próprias palavras — evite copiar frases do texto original.
 	3. Foque em **dados técnicos**, **impactos reais no setor de tecnologia**, **exemplos práticos** e **benefícios concretos**. Nada de vaguidão.
 	4. Não use listas, emojis, hashtags, tópicos ou chamadas genéricas como "neste carrossel", "como falamos antes", "segunda no seu e-mail" etc.
 	5. **Traduza** todo o conteúdo para o português antes de processar.
@@ -24,6 +24,7 @@ async function resumirComIA(texto) {
 	7. O texto gerado será impresso em imagem. Priorize coesão e estética textual. Frases muito longas quebrem mal no layout.
 	8. Evite passar noticias de anos passados, se for antiga confira na net se a informação ainda faz sentido, caso contrario você olha algo parecido e insere, mas que bata com noticias atuais.
 	9. Não coloque no titulo em qualquer lugar que a noticia é de 2022 ou anos passados, só 2025 para frente
+	10. Quero que sempre que for gerar o titulos sempre reescreva ele de uma forma totalmente diferente da que estava quando você leu ou pensou, tem titulos repetitivos e isso não é interessante.
 
 	Retorne neste formato **JSON válido**:
 	
@@ -42,7 +43,9 @@ async function resumirComIA(texto) {
 		temperature: 0.7,
 	});
 
-	const resposta = chatCompletion.choices[0].message.content.trim();
+	let resposta = chatCompletion.choices[0].message.content.trim();
+
+	resposta = resposta.replace(/,\s*}/g, "}");
 
 	try {
 		return JSON.parse(resposta);

@@ -15,6 +15,21 @@ module.exports = async function scrapingAirdrop(maxPosts = 5) {
 	const posts = [];
 
 	await page.goto("https://www.aidrop.news", { waitUntil: "networkidle2" });
+
+	await page.waitForSelector(".order-1.col-span-4.flex.justify-center.gap-3.sm\\:order-2");
+
+	const paginas = await page.$$eval(
+		".order-1.col-span-4.flex.justify-center.gap-3.sm\\:order-2 a",
+		(links) => links.map(link => link.href)
+	);
+
+	const paginasNumeradas = paginas.filter(url => /\/archive\?page=\d+$/.test(url));
+	
+	if (paginasNumeradas.length > 0) {
+		const paginaAleatoria = paginasNumeradas[Math.floor(Math.random() * paginasNumeradas.length)];
+		await page.goto(paginaAleatoria, { waitUntil: "networkidle2" });
+	}
+
 	await page.waitForSelector(
 		".grid.grid-cols-1.gap-6.md\\:grid-cols-2.lg\\:grid-cols-3"
 	);

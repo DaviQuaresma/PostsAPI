@@ -14,8 +14,15 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 	const browser = await puppeteer.launch({ headless: true });
 	const page = await browser.newPage();
 	const posts = [];
+	let randomNum = Math.floor(Math.random() * 10);
 
-	await page.goto("https://techcrunch.com/category/artificial-intelligence/", {
+	if (randomNum === 0){
+		randomNum = 1
+	}
+
+	let urlVar = `https://techcrunch.com/category/artificial-intelligence/page/${randomNum}/`;
+
+	await page.goto(urlVar, {
 		waitUntil: "networkidle2",
 		timeout: 60000,
 	});
