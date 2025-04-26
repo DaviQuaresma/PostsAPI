@@ -38,7 +38,7 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 		const { link, image } = selecionados[i];
 
 		try {
-			await page.goto(link, { waitUntil: "networkidle2" });
+			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
 			await page.waitForSelector(".mrf-article-body");
 
 			const texto = await page.$eval(".mrf-article-body", (el) =>
