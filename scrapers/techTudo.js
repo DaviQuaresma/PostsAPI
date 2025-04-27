@@ -10,13 +10,17 @@ const fs = require("fs");
 const fetch = require("node-fetch");
 
 module.exports = async function scrapingTechtudo(maxPosts = 5) {
-	const browser = await puppeteer.launch({ headless: false });
+	const browser = await puppeteer.launch({
+		headless: true, // se tiver headless ou outras configs
+		args: ["--no-sandbox", "--disable-setuid-sandbox"],
+	});
+
 	const page = await browser.newPage();
 	const posts = [];
 	let randomNum = Math.floor(Math.random() * 20);
 
-	if (randomNum === 0){
-		randomNum = 1
+	if (randomNum === 0) {
+		randomNum = 1;
 	}
 
 	let urlVar = `https://www.techtudo.com.br/busca/?q=IA&page=${randomNum}`;

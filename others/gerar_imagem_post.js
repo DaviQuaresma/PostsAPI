@@ -28,7 +28,11 @@ async function gerarImagemPost(dados, index = 1) {
 		.replace(/{{USERNAME}}/g, dados.username);
 
 	// Lança o navegador e gera o print
-	const browser = await puppeteer.launch({ headless: true });
+	const browser = await puppeteer.launch({
+		headless: true, // se tiver headless ou outras configs
+		args: ["--no-sandbox", "--disable-setuid-sandbox"],
+	});
+
 	const page = await browser.newPage();
 
 	await page.setViewport({

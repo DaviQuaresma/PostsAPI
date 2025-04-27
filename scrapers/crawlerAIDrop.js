@@ -10,23 +10,32 @@ const fs = require("fs");
 const fetch = require("node-fetch");
 
 module.exports = async function scrapingAirdrop(maxPosts = 5) {
-	const browser = await puppeteer.launch({ headless: true });
+	const browser = await puppeteer.launch({
+		headless: true, // se tiver headless ou outras configs
+		args: ["--no-sandbox", "--disable-setuid-sandbox"],
+	});
+
 	const page = await browser.newPage();
 	const posts = [];
 
 	await page.goto("https://www.aidrop.news", { waitUntil: "networkidle2" });
 
-	await page.waitForSelector(".order-1.col-span-4.flex.justify-center.gap-3.sm\\:order-2");
+	await page.waitForSelector(
+		".order-1.col-span-4.flex.justify-center.gap-3.sm\\:order-2"
+	);
 
 	const paginas = await page.$$eval(
 		".order-1.col-span-4.flex.justify-center.gap-3.sm\\:order-2 a",
-		(links) => links.map(link => link.href)
+		(links) => links.map((link) => link.href)
 	);
 
-	const paginasNumeradas = paginas.filter(url => /\/archive\?page=\d+$/.test(url));
-	
+	const paginasNumeradas = paginas.filter((url) =>
+		/\/archive\?page=\d+$/.test(url)
+	);
+
 	if (paginasNumeradas.length > 0) {
-		const paginaAleatoria = paginasNumeradas[Math.floor(Math.random() * paginasNumeradas.length)];
+		const paginaAleatoria =
+			paginasNumeradas[Math.floor(Math.random() * paginasNumeradas.length)];
 		await page.goto(paginaAleatoria, { waitUntil: "networkidle2" });
 	}
 
