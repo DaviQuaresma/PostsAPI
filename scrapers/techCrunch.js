@@ -12,27 +12,46 @@ const fetch = require("node-fetch");
 
 module.exports = async function techcrunchScraper(maxPosts = 5) {
 	const browser = await puppeteer.launch({
-		headless: true, // se tiver headless ou outras configs
+		headless: true,
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
 	});
 
 	const page = await browser.newPage();
 	const posts = [];
-	let randomNum = Math.floor(Math.random() * 10);
 
-	if (randomNum === 0) {
-		randomNum = 1;
-	}
-
-	let urlVar = `https://techcrunch.com/category/artificial-intelligence/page/${randomNum}/`;
-
-	await page.goto(urlVar, {
+	// Acessa a primeira página normalmente
+	await page.goto("https://techcrunch.com/category/artificial-intelligence/", {
 		waitUntil: "networkidle2",
 		timeout: 60000,
 	});
 
+	// Define número de cliques aleatório no botão "Next"
+	const maxClicks = Math.floor(Math.random() * 5) + 1; // Entre 1 e 5
+	console.log(`🔄 Avançando até ${maxClicks} vezes pelo botão "Next"`);
+
+	// Faz os cliques
+	for (let i = 0; i < maxClicks; i++) {
+		try {
+			await page.waitForSelector("a.wp-block-query-pagination-next", {
+				timeout: 5000,
+			});
+			await Promise.all([
+				page.waitForNavigation({ waitUntil: "networkidle2" }),
+				page.click("a.wp-block-query-pagination-next"),
+			]);
+			console.log(`➡️ Página avançada (${i + 1}/${maxClicks})`);
+		} catch (err) {
+			console.warn(
+				`⚠️ Botão "Next" não encontrado ou erro ao clicar: ${err.message}`
+			);
+			break;
+		}
+	}
+
+	// Espera os cards carregarem
 	await page.waitForSelector(".wp-block-query");
 
+	// Extrai os dados dos posts
 	const cardsData = await page.$$eval("h3.loop-card__title a", (elements) =>
 		elements.map((el) => ({
 			link: el.href,
@@ -40,21 +59,23 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 		}))
 	);
 
+	// Extrai imagens associadas
 	const images = await page.$$eval(".loop-card img", (imgs) =>
 		imgs.map((el) => el.src || null)
 	);
 
+	// Embaralha e seleciona os posts
 	const total = Math.min(maxPosts, cardsData.length);
 	const shuffled = cardsData.sort(() => 0.5 - Math.random());
 	const selecionados = shuffled.slice(0, total);
 
 	for (let i = 0; i < selecionados.length; i++) {
 		const { link } = selecionados[i];
-
 		const img = images[i];
 
 		try {
 			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
+
 			try {
 				await page.waitForSelector(".wp-block-column.is-layout-flow", {
 					timeout: 8000,
@@ -83,6 +104,7 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 				__dirname,
 				`../imgs/techcrunch/techcrunch-post-${i + 1}.jpg`
 			);
+
 			if (img) {
 				const res = await fetch(img);
 				if (!res.ok)
