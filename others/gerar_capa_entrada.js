@@ -33,12 +33,14 @@ async function gerarCapaEntrada(posts) {
         background: linear-gradient(135deg, #0a0f2c, #1e2749);
         color: white;
         width: 1080px;
-        min-height: 1500px;
-        text-align: center;
+        height: 1350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       h1 {
-        margin-top: 40px;
+        margin-top: 60px;
         font-size: 50px;
         color: #8ce4ff;
         text-shadow: 0 0 10px #8ce4ff, 0 0 20px #00bcd4;
@@ -46,11 +48,11 @@ async function gerarCapaEntrada(posts) {
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* sempre 2 por linha */
+        grid-template-columns: repeat(2, 1fr);
         gap: 40px 40px;
-        padding: 40px 60px;
+        width: 700px;
+        padding: 40px 0;
         box-sizing: border-box;
-        justify-content: center;
       }
 
       .card {
@@ -59,15 +61,26 @@ async function gerarCapaEntrada(posts) {
         padding: 15px;
         text-align: center;
         position: relative;
+        width: 100%;
+        height: 300px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       .card img {
-	width: 100%;
-	height: 220px; /* mais quadrado */
-	object-fit: cover;
-	border-radius: 12px;
-}
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 12px;
+      }
+
+      .card-title {
+        font-size: 30px;
+        font-weight: 500;
+        margin-top: 10px;
+      }
 
       .card-number {
         position: absolute;
@@ -77,36 +90,22 @@ async function gerarCapaEntrada(posts) {
         padding: 5px 10px;
         border-radius: 50%;
         font-weight: bold;
-        font-size: 14px;
       }
 
-      .card-title {
-        margin-top: 12px;
-        font-size: 18px;
-        font-weight: 500;
-        min-height: 50px;
+      .footer {
+        font-size: 28px;
+        color: #aaa;
+        margin-bottom: 50px;
       }
-
-      .wrapper {
-	min-height: 1350px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
-.footer {
-	margin-bottom: 40px;
-}
     </style>
   </head>
   <body>
-  <div class="wrapper">
     <h1>Notícias de IA</h1>
     <div class="grid">
       ${cardsHTML}
     </div>
     <div class="footer">Arraste para entender tudo</div>
-  </div>
-</body>
+  </body>
   </html>
 `;
 
@@ -116,10 +115,8 @@ async function gerarCapaEntrada(posts) {
 	});
 	const page = await browser.newPage();
 
-	await page.setViewport({ width: 1080, height: 1800 }); // maior que o padrão
+	await page.setViewport({ width: 1080, height: 1350 }); // exato 4:5
 	await page.setContent(html, { waitUntil: "networkidle0" });
-
-	// captura só o necessário sem ultrapassar a tela
 	await page.screenshot({ path: outputPath, fullPage: false });
 
 	await browser.close();
