@@ -98,7 +98,9 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 				continue;
 			}
 
-			const { titulo, resumo } = await resumirComIA(texto.slice(0, 8000));
+			const { titulo, titulo_curto, resumo } = await resumirComIA(
+				texto.slice(0, 8000)
+			);
 
 			const imagePath = path.join(
 				__dirname,
@@ -116,6 +118,7 @@ module.exports = async function techcrunchScraper(maxPosts = 5) {
 
 			posts.push({
 				titulo,
+				titulo_curto,
 				resumo,
 				imagem: `data:image/jpeg;base64,${fs.readFileSync(imagePath, {
 					encoding: "base64",

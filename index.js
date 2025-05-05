@@ -9,6 +9,7 @@ const runAiDrop = require("./scrapers/crawlerAIDrop");
 const runTechCrunch = require("./scrapers/techCrunch");
 const runTechTudo = require("./scrapers/techTudo");
 const enviarEmailComImagens = require("./others/sendEmail.js"); // <- Novo
+const gerarCapaEntrada = require("./others/gerar_capa_entrada");
 
 dotenv.config(); // <- Carrega variáveis do .env
 
@@ -48,6 +49,15 @@ async function start(quantidade) {
 
 	const embaralhado = await embaralhar(todosPosts);
 
+	// 🔹 Gera a capa antes dos posts
+	const postsParaCapa = embaralhado.map((post) => ({
+		titulo: post.titulo,
+		titulo_curto: post.titulo_curto,
+		imagem: post.imagem,
+	}));
+	await gerarCapaEntrada(postsParaCapa);
+
+	// 🔹 Gera os posts individuais
 	let numero = 1;
 	for (const post of embaralhado) {
 		await gerarImagemPost({ ...post, numero }, numero);
@@ -56,8 +66,7 @@ async function start(quantidade) {
 
 	console.log("✅ Finalizado com sucesso!");
 
-	// Envia as imagens por e-mail
-	await enviarEmailComImagens(); // <- Novo
+	await enviarEmailComImagens(); // envia tudo, incluindo entrada.png
 }
 
 const cors = require("cors");
@@ -76,7 +85,7 @@ app.get("/executar", async (req, res) => {
 		res.send("✅ Geração finalizada e enviada por e-mail!");
 	} catch (err) {
 		res.status(500).send("❌ Erro ao executar: " + err.message);
-        return
+		return;
 	}
 });
 

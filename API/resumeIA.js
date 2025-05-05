@@ -30,6 +30,7 @@ async function resumirComIA(texto) {
 	
 	{
 	  "titulo": "EXEMPLO DE TÍTULO",
+	  "titulo_curto: "Titulo de no maximo 2 palavras"
 	  "resumo": "Resumo com riqueza de informações, estilo humanizado, vocabulário técnico e conteúdo autêntico que represente a notícia original com profundidade."
 	}
 	
