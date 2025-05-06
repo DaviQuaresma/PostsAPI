@@ -3,6 +3,7 @@
 const express = require("express");
 const app = express();
 const path = require("path");
+const fs = require("fs");
 const dotenv = require("dotenv");
 const gerarImagemPost = require("./others/gerar_imagem_post");
 const runAiDrop = require("./scrapers/crawlerAIDrop");
@@ -66,7 +67,19 @@ async function start(quantidade) {
 
 	console.log("✅ Finalizado com sucesso!");
 
-	await enviarEmailComImagens(); // envia tudo, incluindo entrada.png
+	const outputPath = path.resolve(__dirname, "./output");
+	const arquivos = fs.readdirSync(outputPath);
+
+	// Filtra imagens (ex: .png, .jpg)
+	const imagens = arquivos.filter((arquivo) =>
+		/\.(png|jpe?g|webp)$/i.test(arquivo)
+	);
+
+	if (imagens % 2 !== 0 && imagens.length >= 5 || imagens.length <= 7) {
+		await enviarEmailComImagens();
+	} else {
+		return "Erro ao gerar imagens, tente novamente";
+	}
 }
 
 const cors = require("cors");

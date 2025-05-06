@@ -30,7 +30,7 @@ async function resumirComIA(texto) {
 	
 	{
 	  "titulo": "EXEMPLO DE TÍTULO",
-	  "titulo_curto: "Titulo de no maximo 2 palavras"
+	  "titulo_curto: "Titulo de no maximo 2 palavras",
 	  "resumo": "Resumo com riqueza de informações, estilo humanizado, vocabulário técnico e conteúdo autêntico que represente a notícia original com profundidade."
 	}
 	
@@ -46,7 +46,11 @@ async function resumirComIA(texto) {
 
 	let resposta = chatCompletion.choices[0].message.content.trim();
 
-	resposta = resposta.replace(/,\s*}/g, "}");
+	resposta = resposta
+		.replace(/,\s*}/g, "}")
+		.replace(/"titulo_curto":\s*"[^"]+"\s*"resumo":/, (match) =>
+			match.replace(/"\s*"/, '", "')
+		);
 
 	try {
 		return JSON.parse(resposta);
