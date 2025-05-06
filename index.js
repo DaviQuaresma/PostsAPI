@@ -28,6 +28,8 @@ async function start(quantidade) {
 	let todosPosts = [];
 
 	try {
+		if (quantidade === 0) return;
+
 		const postsTechCrunch = await runTechCrunch(quantidade.techCrunch);
 		todosPosts.push(...postsTechCrunch);
 	} catch (err) {
@@ -35,6 +37,8 @@ async function start(quantidade) {
 	}
 
 	try {
+		if (quantidade === 0) return;
+
 		const postsAiDrop = await runAiDrop(quantidade.airdrop);
 		todosPosts.push(...postsAiDrop);
 	} catch (err) {
@@ -42,6 +46,8 @@ async function start(quantidade) {
 	}
 
 	try {
+		if (quantidade === 0) return;
+
 		const postsTechTudo = await runTechTudo(quantidade.techtudo);
 		todosPosts.push(...postsTechTudo);
 	} catch (err) {
@@ -75,10 +81,14 @@ async function start(quantidade) {
 		/\.(png|jpe?g|webp)$/i.test(arquivo)
 	);
 
-	if (imagens % 2 !== 0 && imagens.length >= 5 || imagens.length <= 7) {
+	if (
+		(imagens.length % 2 !== 0 && imagens.length === 5) ||
+		imagens.length === 7
+	) {
 		await enviarEmailComImagens();
 	} else {
-		return "Erro ao gerar imagens, tente novamente";
+		console.error("❌ Erro ao gerar imagens, tente novamente.");
+		throw new Error("Erro ao gerar imagens, tente novamente.");
 	}
 }
 

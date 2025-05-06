@@ -1,6 +1,5 @@
 /**
  * techTudo.js - Retorna um array de objetos com dados prontos para gerar imagem de post
- *
  * @format
  */
 
@@ -12,47 +11,22 @@ const fetch = require("node-fetch");
 
 module.exports = async function scrapingTechtudo(maxPosts = 5) {
 	const browser = await puppeteer.launch({
-		headless: true,
+		headless: true, // se tiver headless ou outras configs
 		args: ["--no-sandbox", "--disable-setuid-sandbox"],
 	});
 
 	const page = await browser.newPage();
 	const posts = [];
 
-	// Acessa a primeira página de busca de IA
-	const urlVar = `https://www.techtudo.com.br/busca/?q=IA`;
+	let urlVar = `https://www.techtudo.com.br/busca/?q=IA`;
+
 	await page.goto(urlVar, {
 		waitUntil: "networkidle2",
-		timeout: 60000,
 	});
 
-	// Randomiza de 1 a 5 cliques no botão "Veja mais"
-	const maxClicks = Math.floor(Math.random() * 5) + 1;
-	console.log(`🔄 Avançando até ${maxClicks} vezes pelo botão "Veja mais"`);
-
-	for (let i = 0; i < maxClicks; i++) {
-		try {
-			await page.waitForSelector("a.fundo-cor-produto.pagination__load-more", {
-				timeout: 5000,
-			});
-			await Promise.all([
-				page.waitForNavigation({ waitUntil: "networkidle2" }),
-				page.click("a.fundo-cor-produto.pagination__load-more"),
-			]);
-			console.log(`➡️ Página avançada (${i + 1}/${maxClicks})`);
-		} catch (err) {
-			console.warn(
-				`⚠️ Botão "Veja mais" não encontrado ou erro ao clicar: ${err.message}`
-			);
-			break;
-		}
-	}
-
-	// Agora espera aparecer os cards
 	await page.waitForSelector(".results__list");
 
-	// Extrai os cards
-	let cards = await page.$$eval("li.widget--card.widget--info", (nodes) =>
+	const cards = await page.$$eval("li.widget--card.widget--info", (nodes) =>
 		nodes.map((el) => {
 			const a = el.querySelector("a[href]");
 			const img = el.querySelector("img");
@@ -62,48 +36,42 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 		})
 	);
 
-	// Filtra para pegar apenas artigos e ignora vídeos
-	cards = cards.filter((card) => {
-		if (!card.link || card.link.includes("/video/")) {
-			console.log(`🚫 Ignorado link inválido ou de vídeo: ${card.link}`);
-			return false;
-		}
-		return true;
-	});
-
-	// Embaralha os resultados
 	const total = Math.min(maxPosts, cards.length);
 	const shuffled = cards.sort(() => 0.5 - Math.random());
 	const selecionados = shuffled.slice(0, total);
 
 	for (let i = 0; i < selecionados.length; i++) {
-		const { link, image } = selecionados[i]; // ✅ Usando corretamente o image
-
-		if (!link.startsWith("https://www.techtudo.com.br/")) {
-			console.warn(
-				`⚠️ Link fora do domínio esperado, pulando post ${i + 1}: ${link}`
-			);
-			continue;
-		}
+		const { link, image } = selecionados[i];
 
 		try {
 			await page.goto(link, { waitUntil: "networkidle2", timeout: 60000 });
+			await page.waitForSelector(".mrf-article-body");
 
-			try {
-				await page.waitForSelector(".mrf-article-body", { timeout: 8000 });
-			} catch (err) {
-				console.warn(
-					`⚠️ Conteúdo de artigo não encontrado no post ${i + 1}, pulando...`
-				);
-				continue;
+			const seletoresPossiveis = [
+				".mrf-article-body",
+				".materia-conteudo",
+				".content-text",
+				".content",
+			];
+
+			let texto = "";
+
+			for (const seletor of seletoresPossiveis) {
+				try {
+					await page.waitForSelector(seletor, { timeout: 5000 });
+					texto = await page.$eval(seletor, (el) => el.innerText.trim());
+					if (texto.length > 100) break; // Se extraiu conteúdo válido, sai do loop
+				} catch (_) {
+					continue; // Tenta o próximo seletor
+				}
 			}
 
-			const texto = await page.$eval(".mrf-article-body", (el) =>
-				el.innerText.trim()
-			);
-
-			if (!texto) {
-				console.warn(`⚠️ Texto vazio no post ${i + 1}, pulando...`);
+			if (!texto || texto.length < 100) {
+				console.warn(
+					`⚠️ Conteúdo não encontrado ou muito curto no post ${
+						i + 1
+					}, pulando...`
+				);
 				continue;
 			}
 
@@ -113,24 +81,15 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 
 			const imagePath = path.join(
 				__dirname,
-				`../imgs/techtudo/techtudo-post-${i + 1}.jpg`
+				`../imgs/techctudo/techtudo-post-${i + 1}.jpg`
 			);
-
 			if (image) {
-				try {
-					const res = await fetch(image);
-					if (!res.ok)
-						throw new Error(`Erro ao baixar imagem: ${res.statusText}`);
-					const buffer = await res.buffer();
-					fs.mkdirSync(path.dirname(imagePath), { recursive: true });
-					fs.writeFileSync(imagePath, buffer);
-				} catch (imgErr) {
-					console.warn(
-						`⚠️ Erro ao baixar/salvar imagem para o post ${i + 1}: ${
-							imgErr.message
-						}`
-					);
-				}
+				const res = await fetch(image);
+				if (!res.ok)
+					throw new Error(`Erro ao baixar imagem: ${res.statusText}`);
+				const buffer = await res.buffer();
+				fs.mkdirSync(path.dirname(imagePath), { recursive: true });
+				fs.writeFileSync(imagePath, buffer);
 			}
 
 			posts.push({
@@ -146,12 +105,8 @@ module.exports = async function scrapingTechtudo(maxPosts = 5) {
 				avatar: `file://${path.join(__dirname, "../imgs/autor.jpg")}`,
 			});
 		} catch (err) {
-			console.error(`❌ Erro ao processar post ${i + 1}: ${err.message}`);
-			continue;
+			console.error(`❌ Erro ao processar post ${i + 1}:`, err.message);
 		}
-
-		// Dá uma descansada de 1 segundo entre os posts
-		await page.waitForTimeout(1000);
 	}
 
 	await browser.close();

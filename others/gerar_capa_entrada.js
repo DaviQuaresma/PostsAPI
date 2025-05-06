@@ -54,7 +54,7 @@ async function gerarCapaEntrada(posts) {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 40px 40px;
-        width: 750px;
+        width: 800px;
         padding: 0 0 20px;
         box-sizing: border-box;
       }
@@ -68,7 +68,7 @@ async function gerarCapaEntrada(posts) {
         text-align: center;
         position: relative;
         width: 100%;
-        height: 300px;
+        height: 250px;
         box-shadow: 0 0 10px rgba(0, 221, 255, 0.4),
           0 0 20px rgba(0, 221, 255, 0.2), 0 0 30px rgba(0, 221, 255, 0.1);
         display: flex;
@@ -153,7 +153,7 @@ async function gerarCapaEntrada(posts) {
 	});
 	const page = await browser.newPage();
 
-	await page.setViewport({ width: 1080, height: 1350 }); // 4:5
+	await page.setViewport({ width: 1080, height: 1350 });
 	await page.setContent(html, { waitUntil: "networkidle0" });
 	await page.screenshot({ path: outputPath, fullPage: false });
 
