@@ -9,10 +9,14 @@ const gerarImagemPost = require("./others/gerar_imagem_post");
 const runAiDrop = require("./scrapers/crawlerAIDrop");
 const runTechCrunch = require("./scrapers/techCrunch");
 const runTechTudo = require("./scrapers/techTudo");
-const enviarEmailComImagens = require("./others/sendEmail.js"); // <- Novo
+const enviarEmailComImagens = require("./others/sendEmail.js");
 const gerarCapaEntrada = require("./others/gerar_capa_entrada");
+const cors = require("cors");
+app.use(cors());
+app.use(express.static("public"));
 
-dotenv.config(); // <- Carrega variáveis do .env
+
+dotenv.config();
 
 async function embaralhar(array) {
 	for (let i = array.length - 1; i > 0; i--) {
@@ -24,39 +28,57 @@ async function embaralhar(array) {
 
 async function start(quantidade) {
 	console.log("🚀 Iniciando geração de posts...");
+	console.log("📋 Parâmetros recebidos:", quantidade);
 
 	let todosPosts = [];
 
-	try {
-		if (quantidade === 0) return;
-
-		const postsTechCrunch = await runTechCrunch(quantidade.techCrunch);
-		todosPosts.push(...postsTechCrunch);
-	} catch (err) {
-		console.error("❌ Erro no TechCrunch:", err.message);
+	// Verifica se pelo menos um scraper foi solicitado
+	if (quantidade.techCrunch === 0 && quantidade.airdrop === 0 && quantidade.techtudo === 0) {
+		console.log("⚠️ Nenhum site selecionado para scraping.");
+		return;
 	}
 
-	try {
-		if (quantidade === 0) return;
-
-		const postsAiDrop = await runAiDrop(quantidade.airdrop);
-		todosPosts.push(...postsAiDrop);
-	} catch (err) {
-		console.error("❌ Erro no AiDrop:", err.message);
+	// Executa TechCrunch se solicitado
+	if (typeof quantidade.techCrunch === "number" && quantidade.techCrunch > 0) {
+		try {
+			console.log(`📰 Executando TechCrunch com ${quantidade.techCrunch} posts...`);
+			const postsTechCrunch = await runTechCrunch(quantidade.techCrunch);
+			todosPosts.push(...postsTechCrunch);
+		} catch (err) {
+			console.error("❌ Erro no TechCrunch:", err.message);
+		}
 	}
 
-	try {
-		if (quantidade === 0) return;
+	// Executa AiDrop se solicitado
+	if (typeof quantidade.airdrop === "number" && quantidade.airdrop > 0) {
+		try {
+			console.log(`🚀 Executando AiDrop com ${quantidade.airdrop} posts...`);
+			const postsAiDrop = await runAiDrop(quantidade.airdrop);
+			todosPosts.push(...postsAiDrop);
+		} catch (err) {
+			console.error("❌ Erro no AiDrop:", err.message);
+		}
+	}
 
-		const postsTechTudo = await runTechTudo(quantidade.techtudo);
-		todosPosts.push(...postsTechTudo);
-	} catch (err) {
-		console.error("❌ Erro no TechTudo:", err.message);
+	// Executa TechTudo se solicitado
+	if (typeof quantidade.techtudo === "number" && quantidade.techtudo > 0) {
+		try {
+			console.log(`💻 Executando TechTudo com ${quantidade.techtudo} posts...`);
+			const postsTechTudo = await runTechTudo(quantidade.techtudo);
+			todosPosts.push(...postsTechTudo);
+		} catch (err) {
+			console.error("❌ Erro no TechTudo:", err.message);
+		}
 	}
 
 	const embaralhado = await embaralhar(todosPosts);
+	console.log(`🎲 Posts embaralhados: ${embaralhado.length} posts prontos para gerar imagens`);
 
-	// 🔹 Gera a capa antes dos posts
+	if (embaralhado.length === 0) {
+		console.error("❌ Nenhum post foi coletado pelos scrapers!");
+		throw new Error("Nenhum post foi coletado. Verifique os scrapers.");
+	}
+
 	const postsParaCapa = embaralhado.map((post) => ({
 		titulo: post.titulo,
 		titulo_curto: post.titulo_curto,
@@ -64,7 +86,6 @@ async function start(quantidade) {
 	}));
 	await gerarCapaEntrada(postsParaCapa);
 
-	// 🔹 Gera os posts individuais
 	let numero = 1;
 	for (const post of embaralhado) {
 		await gerarImagemPost({ ...post, numero }, numero);
@@ -76,25 +97,26 @@ async function start(quantidade) {
 	const outputPath = path.resolve(__dirname, "./output");
 	const arquivos = fs.readdirSync(outputPath);
 
+	console.log("output:", outputPath);
+	console.log("📁 Arquivos na pasta output:", arquivos);
+
 	// Filtra imagens (ex: .png, .jpg)
 	const imagens = arquivos.filter((arquivo) =>
 		/\.(png|jpe?g|webp)$/i.test(arquivo)
 	);
 
-	if (
-		(imagens.length % 2 !== 0 && imagens.length === 5) ||
-		imagens.length === 7
-	) {
+	console.log("📸 Imagens geradas:", imagens);
+	console.log(`📊 Total de imagens: ${imagens.length}`);
+
+	// Critério de sucesso: pelo menos 2 imagens (entrada + pelo menos 1 post)
+	if (imagens.length >= 2) {
+		console.log("✅ Número suficiente de imagens geradas, enviando email...");
 		await enviarEmailComImagens();
 	} else {
-		console.error("❌ Erro ao gerar imagens, tente novamente.");
-		throw new Error("Erro ao gerar imagens, tente novamente.");
+		console.error(`❌ Apenas ${imagens.length} imagem(ns) gerada(s). Esperado pelo menos 2.`);
+		throw new Error(`Erro ao gerar imagens: apenas ${imagens.length} gerada(s), tente novamente.`);
 	}
 }
-
-const cors = require("cors");
-app.use(cors());
-app.use(express.static("public"));
 
 // senha = noticiabot2025
 
